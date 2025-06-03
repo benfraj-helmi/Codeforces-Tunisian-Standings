@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codeforces Tunisian Standings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #fff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 5%;
+    background-color: #f5f7fa;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40%;
+    margin-right: 15px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-right a {
+    color: var(--primary); /* Couleur par défaut (gris foncé) */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: var(--transition);
+    position: relative;
+}
+
+/* Style pour le lien actif - doit être APRÈS la déclaration de base */
+.nav-right a.active_Nav {
+    color: var(--secondary); /* Couleur de texte bleu */
+    background: rgba(101, 100, 100, 0.1); /* Fond gris */
+    cursor: default; /* Curseur normal */
+}
+
+.nav-right a.active_Nav::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%; /* Barre pleine largeur */
+    height: 3px;
+    background: var(--secondary); /* Couleur bleue */
+    transition: var(--transition);
+}
+
+/* Style pour le survol - doit être APRÈS la déclaration du lien actif */
+.nav-right a:hover {
+    color: var(--secondary);
+    background: rgba(101, 100, 100, 0.1);
+}
+
+.nav-right a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--secondary);
+    transition: var(--transition);
+}
+
+.nav-right a:hover::after {
+    width: 100%;
+}     
+        .hero-section {
+            display: flex;
+            min-height: 85vh;
+            padding: 2rem 5%;
+            background: linear-gradient(rgba(242, 247, 251, 0.9), rgba(106, 113, 121, 0.9)),
+                url('image.png') center/cover;
+            color: white;
+            align-items: center;
+            
+        }
+
+        .text-block {
+            flex: 1;
+            padding-right: 3rem;
+            animation: fadeInLeft 1s ease;
+        }
+
+        .text-block h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: rgb(154, 42, 42);
+
+        }
+
+        .text-block p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            color: #2c3e50;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInRight 1s ease;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 600px;
+            background-color: #7d7f8268;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image img:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .feature-section {
+            padding: 9rem 5%;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 4rem;
+            color: var(--dark);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .container1 {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 1;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--secondary);
+            z-index: 2;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-content {
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .card p {
+            margin-bottom: 2rem;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn:hover {
+            background: white;
+            color: var(--secondary);
+            transform: translateY(-3px);
+            border: 2px solid white;
+            border: 2px solid var(--secondary);
+        }
+
+        footer {
+            background: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .text-block {
+                padding-right: 0;
+                margin-bottom: 3rem;
+            }
+
+            .text-block p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .nav-right {
+                margin-top: 1rem;
+                gap: 1rem;
+            }
+
+            .text-block h1 {
+                font-size: 2.5rem;
+            }
+
+            .text-block p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .card {
+                max-width: 100%;
+            }
+        }
+        /* Animation pour l'apparition progressive */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: fadeIn 0.8s ease forwards;
+    opacity: 0;
+}
+
+.delay-1 {
+    animation-delay: 0.2s;
+}
+
+/* Styles spécifiques pour la section Comment ça marche */
+.feature-section .step-card {
+    flex: 1;
+    min-width: 250px;
+    padding: 15px;
+    border-left: 3px solid var(--secondary);
+    transition: var(--transition);
+    border-radius: 0 8px 8px 0;
+    background: rgba(255, 255, 255, 0.7);
+    margin: 10px 0;
+}
+
+.feature-section .step-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-section .step-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    color: var(--dark);
+}
+
+.feature-section .step-card p {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Adaptation pour la carte principale */
+.feature-section .card .card-content h2 {
+    margin-bottom: 2rem;
+}
+
+/* Styles responsives */
+@media (max-width: 768px) {
+    .feature-section .step-card {
+        min-width: 100%;
+        margin: 15px 0;
+    }
+    
+    .feature-section .step-card h3 {
+        font-size: 1.2rem;
+    }
+}
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html"><img src="logo.png" alt="Logo" class="logo"></a>
+        </div>
+        <div class="nav-right">
+            <a href="index.html"  id="nav-home">Accueil</a>
+            <a href="#Apropos" id="nav-about">A&nbsp;propos</a>
+            <a href="problem.html" id="nav-problems">Problems</a>
+            <a href="contest.html" id="nav-contests">Contests</a>
+            <a href="#contact" id="nav-contact">Contact</a>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="text-block">
+            <h1>Codeforces Tunisian Standings</h1>
+            <div style="height: 180px;">
+                <p id="typewriter-text"></p>
+            </div>
+            <a href="#Apropos" class="btn">Commencer maintenant</a>
+        </div>
+        <div class="hero-image">
+            <img src="image.png" alt="Programming Illustration">
+        </div>
+    </section>
+
+    <section class="feature-section" id="Apropos">
+        <h2 class="section-title">Explorez nos fonctionnalités</h2>
+        <p class="section-subtitle">Découvrez toutes les fonctionnalités qui vous aideront à suivre votre progression et
+            à vous comparer avec d'autres programmeurs tunisiens.</p>
+
+        <main class="container1">
+            <div class="card">
+                <div class="card-content">
+                    <h2><i class="fas fa-trophy"></i> Classement des Contests</h2>
+                    <p>Classement des utilisateurs tunisiens par concours — suivez votre performance sur chaque contest Codeforces.</p>
+                    <a href="contest.html" class="btn">Voir les Contests</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <h2><i class="fas fa-chart-bar"></i> Problèmes Résolus</h2>
+                    <p>Classement des utilisateurs tunisiens selon le nombre de problèmes résolus — tous les temps, l’année dernière, le mois dernier ou aujourd’hui.
+                    </p>
+                    <a href="problem.html" class="btn">Voir les Stats</a>
+                </div>
+            </div>
+        </main>
+    </section>
+<section class="feature-section" style="background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); padding: 4rem 5%;">
+        <div class="container1" style="max-width: 1200px; margin: 0 auto;">
+            <div class="card animate-in delay-1" style="max-width: 100%;">
+                <div class="card-content">
+                    <h2><i class="fas fa-lightbulb"></i> Pourquoi nous ?</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+                        <div style="flex: 1; min-width: 250px; padding: 15px; border-left: 3px solid var(--secondary);">
+                            <h3><i class="fas fa-user-plus" style="color: var(--secondary);"></i> Ajoutez un handle</h3>
+                            <p>Entrez un pseudonyme Codeforces pour apparaître dans les classements tunisiens.</p>
+                        </div>
+                        <div style="flex: 1; min-width: 250px; padding: 15px; border-left: 3px solid var(--primary);">
+                            <h3><i class="fas fa-chart-line" style="color: var(--primary);"></i> Analysez vos performances</h3>
+                            <p>Consultez vos statistiques détaillées et comparez-vous avec d'autres programmeurs.</p>
+                        </div>
+                        <div style="flex: 1; min-width: 250px; padding: 15px; border-left: 3px solid var(--primary);">
+                            <h3><i class="fas fa-trophy" style="color: var(--primary);"></i> Progressez</h3>
+                            <p>Identifiez vos forces et faiblesses pour améliorer vos compétences en programmation compétitive.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> 
+    <footer id="contact">
+        <a href="index.html"><img src="logo1.png" alt="" style="width: 350px; padding: 0 20px;"></a>
+        <div class="footer-content">
+            <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive
+            </p>
+            <p>© 2025 Tous droits réservés</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Original text to be typed
+            const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
+
+            // Element to display the text
+            const typewriterElement = document.getElementById('typewriter-text');
+
+            // Clear the element initially
+            typewriterElement.innerHTML = '';
+
+            // Create a cursor element
+            const cursor = document.createElement('span');
+            cursor.className = 'typewriter-cursor';
+            typewriterElement.appendChild(cursor);
+
+            // Function to simulate typewriter effect
+            let index = 0;
+            function typeWriter() {
+                if (index < text.length) {
+                    // Create a text node for the current character
+                    const charNode = document.createTextNode(text.charAt(index));
+
+                    // Insert before the cursor
+                    typewriterElement.insertBefore(charNode, cursor);
+
+                    // Move to next character
+                    index++;
+
+                    // Set timeout for next character
+                    setTimeout(typeWriter, 25); // Adjust typing speed here (milliseconds)
+                } else {
+                    // Remove cursor when done
+                    cursor.remove();
+                }
+            }
+
+            // Start the typewriter effect after a short delay
+            setTimeout(typeWriter, 500);
+        });
+    </script>
+
+    <script>
+        // Fonction pour mettre à jour la navigation active
+        function setActiveNav() {
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien correspondant à la page actuelle
+            const currentPage = window.location.pathname.split('/').pop();
+            const hash = window.location.hash;
+            
+            if (currentPage === 'index.html' && hash === '#Apropos') {
+                document.getElementById('nav-about').classList.add('active_Nav');
+            } else if (currentPage === 'problem.html') {
+                document.getElementById('nav-problems').classList.add('active_Nav');
+            } else if (currentPage === 'contest.html') {
+                document.getElementById('nav-contests').classList.add('active_Nav');
+            } else if (hash === '#contact') {
+                document.getElementById('nav-contact').classList.add('active_Nav');
+            } else {
+                document.getElementById('nav-home').classList.add('active_Nav');
+            }
+        }
+
+        // Gestionnaire pour le lien "A propos"
+        document.getElementById('nav-about').addEventListener('click', function(e) {
+            // Empêcher le comportement par défaut
+            e.preventDefault();
+            
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien "A propos"
+            this.classList.add('active_Nav');
+            
+            // Faire défiler jusqu'à la section "A propos"
+            document.querySelector('#Apropos').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // Appeler la fonction au chargement de la page
+        document.addEventListener('DOMContentLoaded', setActiveNav);
+        
+        // Mettre à jour l'état actif lors des changements de hash
+        window.addEventListener('hashchange', setActiveNav);
+    </script>
+
+</body>
+
+</html>

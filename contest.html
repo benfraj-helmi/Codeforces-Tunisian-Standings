@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Standings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #fff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .pagination-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .pagination-btn {
+            margin: 2px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .pagination-btn:hover {
+            background-color: #ddd;
+        }
+
+        .pagination-btn.active {
+            background-color: #4285f4;
+            color: white;
+            font-weight: bold;
+            border-color: #4285f4;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 5%;
+    background-color: #f5f7fa;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40%;
+    margin-right: 15px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-right a {
+    color: var(--primary); /* Couleur par défaut (gris foncé) */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: var(--transition);
+    position: relative;
+}
+
+/* Style pour le lien actif - doit être APRÈS la déclaration de base */
+.nav-right a.active_Nav {
+    color: var(--secondary); /* Couleur de texte bleu */
+    background: rgba(101, 100, 100, 0.1); /* Fond gris */
+    cursor: default; /* Curseur normal */
+}
+
+.nav-right a.active_Nav::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%; /* Barre pleine largeur */
+    height: 3px;
+    background: var(--secondary); /* Couleur bleue */
+    transition: var(--transition);
+}
+
+/* Style pour le survol - doit être APRÈS la déclaration du lien actif */
+.nav-right a:hover {
+    color: var(--secondary);
+    background: rgba(101, 100, 100, 0.1);
+}
+
+.nav-right a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--secondary);
+    transition: var(--transition);
+}
+
+.nav-right a:hover::after {
+    width: 100%;
+} 
+        /* Main content */
+        .contest-container {
+            flex: 1;
+            padding: 4rem 5%;
+        }
+
+        /* Header styles */
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        select option {
+            padding: 12px 20px;
+            background: white;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        /* Controls styles - MODIFICATIONS PRINCIPALES */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .control-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Styles uniformes pour tous les éléments */
+        #contest-id,
+        #fetch-standings,
+        #organization-filter,
+        #participation-filter,
+        #new-handle,
+        #add-handle-btn {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            height: 48px;
+            /* Hauteur uniforme */
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        /* Style spécifique pour les inputs et selects */
+        #contest-id,
+        #organization-filter,
+        #participation-filter,
+        #new-handle {
+            background: white;
+            min-width: 250px;
+        }
+
+        /* Style pour les boutons */
+        #fetch-standings,
+        #add-handle-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            min-width: 180px;
+        }
+
+        /* Effet de survol */
+        #contest-id:focus,
+        #new-handle:focus,
+        #organization-filter:focus,
+        #participation-filter:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        #fetch-standings:hover,
+        #add-handle-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Flèche pour les selects */
+        #organization-filter,
+        #participation-filter {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+
+        /* Conteneur pour le formulaire d'ajout */
+        .add-handle-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* Message de feedback */
+        #handle-message {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            height: 20px;
+        }
+
+        /* Main content styles */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Table styles */
+        #standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #standings-table thead {
+            background: var(--secondary);
+            color: white;
+        }
+
+        #standings-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        #standings-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        #standings-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #standings-table tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+
+        #standings-table td {
+            padding: 12px 20px;
+            color: var(--dark);
+        }
+
+        #standings-table td:first-child {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Footer styles */
+        footer {
+            background: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        .user-handle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flag-icon {
+            width: 24px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        /* RANK COLORS */
+        .user-gray {
+            color: #808080;
+            text-decoration: none;
+        }
+
+        .user-green {
+            color: #008000;
+            text-decoration: none;
+        }
+
+        .user-cyan {
+            color: #03A89E;
+            text-decoration: none;
+        }
+
+        .user-blue {
+            color: #0000FF;
+            text-decoration: none;
+        }
+
+        .user-violet {
+            color: #AA00AA;
+            text-decoration: none;
+        }
+
+        .user-orange {
+            color: #FF8C00;
+            text-decoration: none;
+        }
+
+        .user-red {
+            color: #FF0000;
+            text-decoration: none;
+        }
+
+        .user-black {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .nav-right {
+                margin-top: 1rem;
+                gap: 1rem;
+            }
+
+            .text-block h1 {
+                font-size: 2.5rem;
+            }
+
+            .text-block p {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #contest-id,
+            #fetch-standings,
+            .filters {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            #standings-table {
+                font-size: 0.9rem;
+            }
+
+            #standings-table th,
+            #standings-table td {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            #standings-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html"><img src="logo.png" alt="Logo" class="logo"></a>
+        </div>
+        <div class="nav-right">
+            <a href="index.html" id="nav-home">Accueil</a>
+            <a href="#Apropos" id="nav-about">A&nbsp;propos</a>
+            <a href="problem.html" id="nav-problems">Problems</a>
+            <a href="contest.html" id="nav-contests">Contests</a>
+            <a href="#contact" id="nav-contact">Contact</a>
+        </div>
+    </nav>
+
+
+    <div class="contest-container">
+        <!-- Header -->
+        <header>
+            <h1>Classement des Contests</h1>
+            <div class="controls">
+                <div class="control-row">
+                    <input type="text" id="contest-id" placeholder="Entrez l'ID du contest">
+                    <button id="fetch-standings"><i class="fas fa-sync"></i> Charger</button>
+                    <select id="organization-filter">
+                        <option value="all">Toutes les organisations</option>
+                    </select>
+                    <select id="participation-filter">
+                        <option value="all">Tous</option>
+                        <option value="official">Officiel</option>
+                        <option value="unofficial">Non-officiel</option>
+                    </select>
+                </div>
+
+                <div class="add-handle-container">
+                    <input type="text" id="new-handle" placeholder="Ajouter un handle tunisien">
+                    <button id="add-handle-btn"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div id="handle-message"></div>
+            </div>
+        </header>
+
+
+        <!-- Main content -->
+        <main>
+            <div id="loading" class="hidden">Chargement...</div>
+
+            <table id="standings-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Rang</th>
+                        <th>Handle</th>
+                        <th>Organisation</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les lignes du classement seront ajoutées ici dynamiquement -->
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container"></div>
+        </main>
+
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <a href="index.html"><img src="logo1.png" alt="" style="width: 350px; padding: 0 20px;"></a>
+        <div class="footer-content">
+            <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive
+            </p>
+            <p>© 2025 Tous droits réservés</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="contest.js"></script>
+    <script src="tunisianHandles.js"></script>
+    <script src="common1.js"></script>
+ <script>
+        // Fonction pour mettre à jour la navigation active
+        function setActiveNav() {
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien correspondant à la page actuelle
+            const currentPage = window.location.pathname.split('/').pop();
+            const hash = window.location.hash;
+            
+            if (currentPage === 'contest.html' && hash === '#contact') {
+                document.getElementById('nav-contact').classList.add('active_Nav');
+            } else if (currentPage === 'problem.html') {
+                document.getElementById('nav-problems').classList.add('active_Nav');
+            } else if (currentPage === 'contest.html') {
+                document.getElementById('nav-contests').classList.add('active_Nav');
+            } else {
+                document.getElementById('nav-home').classList.add('active_Nav');
+            }
+        }
+
+        // Gestionnaire pour le lien "A propos"
+        document.getElementById('nav-contact').addEventListener('click', function(e) {
+            // Empêcher le comportement par défaut
+            e.preventDefault();
+            
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien "A propos"
+            this.classList.add('active_Nav');
+            
+            // Faire défiler jusqu'à la section "A propos"
+            document.querySelector('#contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // Appeler la fonction au chargement de la page
+        document.addEventListener('DOMContentLoaded', setActiveNav);
+        
+        // Mettre à jour l'état actif lors des changements de hash
+        window.addEventListener('hashchange', setActiveNav);
+    </script>
+
+</body>
+
+</html>

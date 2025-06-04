@@ -698,53 +698,64 @@
 
     <script>
         // Typewriter effect
-        document.addEventListener('DOMContentLoaded', function () {
-            const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
-            const typewriterElement = document.getElementById('typewriter-text');
-            typewriterElement.innerHTML = '';
+       
+document.addEventListener('DOMContentLoaded', function () {
+    const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
+    const typewriterElement = document.getElementById('typewriter-text');
+    typewriterElement.innerHTML = '';
 
-            const cursor = document.createElement('span');
-            cursor.className = 'typewriter-cursor';
-            typewriterElement.appendChild(cursor);
+    const cursor = document.createElement('span');
+    cursor.className = 'typewriter-cursor';
+    typewriterElement.appendChild(cursor);
 
-            let index = 0;
-            function typeWriter() {
-                if (index < text.length) {
-                    const charNode = document.createTextNode(text.charAt(index));
-                    typewriterElement.insertBefore(charNode, cursor);
-                    index++;
-                    setTimeout(typeWriter, 25);
-                } else {
-                    cursor.remove();
-                }
-            }
+    let index = 0;
+    function typeWriter() {
+        if (index < text.length) {
+            const charNode = document.createTextNode(text.charAt(index));
+            typewriterElement.insertBefore(charNode, cursor);
+            index++;
+            setTimeout(typeWriter, 25);
+        } else {
+            cursor.remove();
+        }
+    }
 
-            setTimeout(typeWriter, 500);
+    setTimeout(typeWriter, 500);
 
-            // Mobile menu toggle
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
-            hamburger.addEventListener('click', (e) => {
-        e.stopPropagation(); // empêche la propagation du clic vers le body
+    // Mobile menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+
+    // Toggle menu on hamburger click
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
         mobileNav.classList.toggle('active');
+        hamburger.classList.toggle('active');
     });
 
-    // Empêche la fermeture quand on clique dans le menu
+    // Prevent menu from closing when clicking inside
     mobileNav.addEventListener('click', (e) => {
         e.stopPropagation();
     });
 
-    // Ferme le menu quand on clique ailleurs
+    // Close menu when clicking outside
     document.addEventListener('click', () => {
         mobileNav.classList.remove('active');
+        hamburger.classList.remove('active');
     });
 
-           
-            });
-
-            // Active navigation
-            setActiveNav();
+    // Close menu when clicking a mobile link
+    document.querySelectorAll('.mobile-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            hamburger.classList.remove('active');
         });
+    });
+
+    // Active navigation (assuming you have a function for this)
+    setActiveNav();
+});
+
 
         // Fonction pour mettre à jour la navigation active
         function setActiveNav() {

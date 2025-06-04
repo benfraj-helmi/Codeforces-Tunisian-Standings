@@ -759,15 +759,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentPage = window.location.pathname.split('/').pop();
     const hash = window.location.hash;
 
-    // Supprimer tous les active_Nav existants
+    // Nettoyage : on enlève toutes les classes active_Nav
     document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
         link.classList.remove('active_Nav');
     });
 
+    // Fonction d'ajout
     const activate = (ids) => {
-        ids.forEach(id => {
-            document.getElementById(id)?.classList.add('active_Nav');
-        });
+        ids.forEach(id => document.getElementById(id)?.classList.add('active_Nav'));
     };
 
     if (currentPage === 'index.html' || currentPage === '') {
@@ -776,12 +775,18 @@ document.addEventListener('DOMContentLoaded', function () {
         else activate(['nav-home', 'nav-home-mobile']);
     } 
     else if (currentPage === 'problem.html') {
-        if (hash === '#contact') activate(['nav-contact', 'nav-contact-mobile']);
-        else activate(['nav-problems', 'nav-problems-mobile']);
+        if (hash === '#contact') {
+            activate(['nav-contact', 'nav-contact-mobile']);
+        } else {
+            activate(['nav-problems', 'nav-problems-mobile']);
+        }
     } 
     else if (currentPage === 'contest.html') {
-        if (hash === '#contact') activate(['nav-contact', 'nav-contact-mobile']);
-        else activate(['nav-contests', 'nav-contests-mobile']);
+        if (hash === '#contact') {
+            activate(['nav-contact', 'nav-contact-mobile']);
+        } else {
+            activate(['nav-contests', 'nav-contests-mobile']);
+        }
     }
 
     // --- CHARGEMENT DES STATS ---
@@ -829,13 +834,13 @@ function simulateLoading() {
         if (progress >= 100) {
             clearInterval(interval);
             loadingIndicator?.classList.add('hidden');
-
             setTimeout(() => {
                 document.querySelector('main')?.style?.setProperty('opacity', '1');
             }, 300);
         }
     }, 100);
 }
+
 </script>
 
 </body>

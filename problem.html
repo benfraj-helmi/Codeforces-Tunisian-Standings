@@ -711,52 +711,30 @@
     <script src="common1.js"></script>
 
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
-    const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
-    const typewriterElement = document.getElementById('typewriter-text');
-    typewriterElement.innerHTML = '';
-
-    const cursor = document.createElement('span');
-    cursor.className = 'typewriter-cursor';
-    typewriterElement.appendChild(cursor);
-
-    let index = 0;
-    function typeWriter() {
-        if (index < text.length) {
-            const charNode = document.createTextNode(text.charAt(index));
-            typewriterElement.insertBefore(charNode, cursor);
-            index++;
-            setTimeout(typeWriter, 25);
-        } else {
-            cursor.remove();
-        }
-    }
-
-    setTimeout(typeWriter, 500);
-
-    // Mobile menu toggle
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
-    // Toggle menu on hamburger click
+    // Ouvrir/Fermer le menu avec le hamburger
     hamburger.addEventListener('click', (e) => {
         e.stopPropagation();
         mobileNav.classList.toggle('active');
         hamburger.classList.toggle('active');
     });
 
-    // Prevent menu from closing when clicking inside
+    // Empêcher fermeture du menu si clic à l'intérieur
     mobileNav.addEventListener('click', (e) => {
         e.stopPropagation();
     });
 
-    // Close menu when clicking outside
+    // Fermer le menu si clic ailleurs
     document.addEventListener('click', () => {
         mobileNav.classList.remove('active');
         hamburger.classList.remove('active');
     });
 
-    // Close menu when clicking a mobile link
+    // Fermer le menu si clic sur un lien
     document.querySelectorAll('.mobile-nav a').forEach(link => {
         link.addEventListener('click', () => {
             mobileNav.classList.remove('active');
@@ -764,9 +742,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Active navigation (assuming you have a function for this)
+    // Activer la navigation en surbrillance
     setActiveNav();
+
+    // Variable de suivi pour le premier chargement
+    let firstLoadDone = false;
+
+    // Chargement manuel via bouton
+    const loadBtn = document.getElementById('load-btn');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', function () {
+            if (typeof loadStats === 'function') {
+                loadStats();
+                firstLoadDone = true;
+            }
+        });
+    }
+
+    // Chargement automatique après sélection si déjà chargé une fois
+    const periodSelect = document.getElementById('period-select');
+    if (periodSelect) {
+        periodSelect.addEventListener('change', function () {
+            if (firstLoadDone && typeof loadStats === 'function') {
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.classList.remove('hidden');
+                }
+
+                // Simulation d’un court délai (remplaçable)
+                setTimeout(() => {
+                    loadStats();
+                }, 300);
+            }
+        });
+    }
 });
+
 
 
 

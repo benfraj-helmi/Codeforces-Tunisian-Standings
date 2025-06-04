@@ -679,25 +679,38 @@
     <script>
         // Gestion du menu mobile
         document.addEventListener('DOMContentLoaded', function () {
-            const hamburger = document.getElementById('hamburger');
-            const mobileNav = document.getElementById('mobileNav');
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
 
-            hamburger.addEventListener('click', () => {
-                mobileNav.classList.toggle('active');
-                hamburger.classList.toggle('active');
-            });
+    // Ouvrir/Fermer le menu mobile
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mobileNav.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
 
-            // Fermer le menu mobile lorsqu'on clique sur un lien
-            document.querySelectorAll('.mobile-nav a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileNav.classList.remove('active');
-                    hamburger.classList.remove('active');
-                });
-            });
+    // Empêcher la fermeture si clic à l'intérieur du menu
+    mobileNav.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
 
-            // Mettre en surbrillance la navigation active
-            setActiveNav();
+    // Fermer le menu si clic ailleurs sur la page
+    document.addEventListener('click', () => {
+        mobileNav.classList.remove('active');
+        hamburger.classList.remove('active');
+    });
+
+    // Fermer le menu si clic sur un lien
+    document.querySelectorAll('.mobile-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            hamburger.classList.remove('active');
         });
+    });
+
+    // Mise en surbrillance de l'onglet actif
+    setActiveNav();
+});
         
 
         // Fonction pour mettre à jour la navigation active

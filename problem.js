@@ -1,219 +1,801 @@
-const problemStatsCache = {};
-const userInfoCache = {};
-const MAX_PARALLEL_REQUESTS = 3;
-const ITEMS_PER_PAGE = 20;
-let currentPage = 1;
-let currentData = [];
+<!DOCTYPE html>
+<html lang="fr">
 
-const requestQueue = {
-    queue: [],
-    inProgress: 0,
-    maxConcurrent: MAX_PARALLEL_REQUESTS,
-    delay: 1200,
-    async add(request) {
-        return new Promise((resolve) => {
-            this.queue.push({ request, resolve });
-            this.process();
-        });
-    },
-    async process() {
-        if (this.inProgress >= this.maxConcurrent || this.queue.length === 0) return;
-        this.inProgress++;
-        const { request, resolve } = this.queue.shift();
-        try {
-            const result = await request();
-            resolve(result);
-        } catch {
-            resolve(null);
-        } finally {
-            this.inProgress--;
-            setTimeout(() => this.process(), this.delay);
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques des Problèmes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-    }
-};
 
-async function fetchWithRetry(url, retries = 3) {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-        try {
-            const response = await fetch(url);
-            if (response.status === 429) {
-                const retryAfter = parseInt(response.headers.get('Retry-After')) || 2;
-                await new Promise(r => setTimeout(r, retryAfter * 1000));
-                continue;
-            }
-            if (!response.ok) {
-                if (response.status >= 400 && response.status < 500) return { status: "FAILED" };
-                throw new Error();
-            }
-            return await response.json();
-        } catch {
-            if (attempt === retries) return { status: "FAILED" };
-            await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+        html {
+            scroll-behavior: smooth;
         }
-    }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #fff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 5%;
+            background-color: #f5f7fa;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-right a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-right a.active_Nav {
+            color: var(--secondary);
+            background: rgba(101, 100, 100, 0.1);
+        }
+
+        .nav-right a.active_Nav::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .nav-right a:hover {
+            color: var(--secondary);
+            background: rgba(101, 100, 100, 0.1);
+        }
+
+        .nav-right a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .nav-right a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background: var(--primary);
+            margin: 2px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        /* Mobile menu */
+       .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 60px; /* ajuste selon la hauteur de ta navbar */
+    left: 0;
+    width: 100%;
+    background: #f5f7fa;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
 }
 
-async function fetchUserProblems(handle) {
-    if (problemStatsCache[handle]) return problemStatsCache[handle];
-    const url = `https://codeforces.com/api/user.status?handle=${encodeURIComponent(handle)}`;
-    const data = await requestQueue.add(() => fetchWithRetry(url));
-    if (data && data.status === "OK") {
-        problemStatsCache[handle] = data.result;
-        return data.result;
-    }
-    problemStatsCache[handle] = [];
-    return [];
-}
 
-async function fetchUserInfo(handle) {
-    if (userInfoCache[handle]) return userInfoCache[handle];
-    const url = `https://codeforces.com/api/user.info?handles=${encodeURIComponent(handle)}`;
-    const data = await requestQueue.add(() => fetchWithRetry(url));
-    if (data && data.status === "OK" && data.result.length > 0) {
-        userInfoCache[handle] = data.result[0];
-        return data.result[0];
-    }
-    userInfoCache[handle] = { organization: "N/A", rating: "N/A" };
-    return userInfoCache[handle];
-}
+        .mobile-nav a {
+            display: block;
+            padding: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
 
-function filterSubmissionsByPeriod(subs, period) {
-    const now = Date.now();
-    return subs.filter(sub => {
-        const t = sub.creationTimeSeconds * 1000;
-        if (period === 'last12months') return t > now - 365 * 24 * 3600 * 1000;
-        if (period === 'last30days') return t > now - 30 * 24 * 3600 * 1000;
-        if (period === 'today') return t > now - 24 * 3600 * 1000;
-        return true;
-    });
-}
+        .mobile-nav a:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
 
-function countUniqueProblems(subs) {
-    const set = new Set();
-    subs.forEach(s => {
-        if (s.verdict === 'OK' && s.problem.contestId)
-            set.add(`${s.problem.contestId}-${s.problem.index}`);
-    });
-    return set.size;
-}
+        /* Main content */
+        .problem-container {
+            flex: 1;
+            padding: 2rem 5%;
+        }
 
-function getRatingClass(rating) {
-    if (!rating) return "rating-newbie";
-    if (rating >= 3000) return "rating-legendary";
-    if (rating >= 2600) return "rating-international";
-    if (rating >= 2400) return "rating-grandmaster";
-    if (rating >= 2300) return "rating-international";
-    if (rating >= 2100) return "rating-master";
-    if (rating >= 1900) return "rating-candidate";
-    if (rating >= 1600) return "rating-expert";
-    if (rating >= 1400) return "rating-specialist";
-    if (rating >= 1200) return "rating-pupil";
-    return "rating-newbie";
-}
+        /* Header styles */
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
 
-async function getUserStats(handle, period) {
-    const subs = await fetchUserProblems(handle);
-    const filtered = filterSubmissionsByPeriod(subs, period);
-    const solved = countUniqueProblems(filtered);
-    const info = await fetchUserInfo(handle);
-    return { handle, solved, organization: info.organization, rating: info.rating };
-}
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
 
-function insertAndSort(newEntry) {
-    currentData.push(newEntry);
-    currentData.sort((a, b) => b.solved - a.solved);
-    renderPage(currentData, currentPage);
-    renderPagination(currentData);
-}
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
 
-function renderPage(data, page) {
-    const tbody = document.querySelector('#problems-table tbody');
-    tbody.innerHTML = '';
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = Math.min(start + ITEMS_PER_PAGE, data.length);
-    data.slice(start, end).forEach((user, index) => {
-        const rating = user.rating ?? 0;
-        const ratingClass = getRatingClass(rating);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>
-                <strong>
-                    ${start + index === 0 ? '🥇' :
-                      start + index === 1 ? '🥈' :
-                      start + index === 2 ? '🥉' :
-                      start + index + 1}
-                </strong>
-            </td>
-            <td class="user-handle">
-                <img src="https://flagcdn.com/w40/tn.png" alt="TN" class="flag-icon">
-                <a href="https://codeforces.com/profile/${user.handle}" target="_blank" 
-                   rel="noopener noreferrer" class="${ratingClass}">
-                    <i class="fas fa-user"></i> ${user.handle}
-                </a>
-            </td>
-            <td>${user.organization || 'N/A'}</td>
-            <td>${user.rating}</td>
-            <td><strong>${user.solved}</strong></td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
+        select option {
+            padding: 12px 20px;
+            background: white;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
 
-function renderPagination(data) {
-    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-    const container = document.getElementById('pagination-container');
-    container.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.className = 'pagination-btn' + (i === currentPage ? ' active' : '');
-        btn.addEventListener('click', () => {
-            currentPage = i;
-            renderPage(data, currentPage);
-            renderPagination(data);
+        /* Conteneur principal des contrôles */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Conteneur pour les filtres et boutons */
+        .control-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Styles communs pour tous les éléments */
+        #period-select,
+        #load-btn,
+        #new-handle,
+        #add-handle-btn {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            height: 48px;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        /* Style spécifique pour le select */
+        #period-select {
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+            min-width: 250px;
+        }
+
+        /* Style pour les boutons */
+        #load-btn,
+        #add-handle-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            min-width: 200px;
+        }
+
+        /* Style pour le champ de texte */
+        #new-handle {
+            background-image: none;
+            padding-right: 20px;
+            min-width: 250px;
+        }
+
+        /* Effet de survol commun */
+        #period-select:focus,
+        #new-handle:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        #load-btn:hover,
+        #add-handle-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Conteneur pour le formulaire d'ajout */
+        .add-handle-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Message de feedback */
+        #handle-message {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            height: 20px;
+        }
+
+        /* Main content styles */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Progress bar styles */
+        #progress-container {
+            background: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        #progress-bar {
+            height: 20px;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #progress-text {
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Table styles */
+        #problems-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        #problems-table thead {
+            background: var(--secondary);
+            color: white;
+        }
+
+        #problems-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        #problems-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        #problems-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #problems-table tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+
+        #problems-table td {
+            padding: 12px 20px;
+            color: var(--dark);
+        }
+
+        .user-handle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flag-icon {
+            width: 24px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        /* RANK COLORS */
+        .user-gray {
+            color: #808080;
+            text-decoration: none;
+        }
+
+        .user-green {
+            color: #008000;
+            text-decoration: none;
+        }
+
+        .user-cyan {
+            color: #03A89E;
+            text-decoration: none;
+        }
+
+        .user-blue {
+            color: #0000FF;
+            text-decoration: none;
+        }
+
+        .user-violet {
+            color: #AA00AA;
+            text-decoration: none;
+        }
+
+        .user-orange {
+            color: #FF8C00;
+            text-decoration: none;
+        }
+
+        .user-red {
+            color: #FF0000;
+            text-decoration: none;
+        }
+
+        .user-black {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .pagination-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .pagination-btn {
+            margin: 3px;
+            padding: 5px 10px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background-color: #4285f4;
+            color: white;
+            font-weight: bold;
+            border-color: #4285f4;
+        }
+
+        .pagination-btn:hover {
+            background-color: #ddd;
+        }
+
+        /* Footer styles */
+        footer {
+            background: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .text-block h1 {
+                font-size: 2.5rem;
+            }
+
+            .text-block p {
+                font-size: 1.1rem;
+            }
+
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+
+        @media (max-width: 768px) {
+            .nav-right {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .logo {
+                max-width: 150px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-row, 
+            .add-handle-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #period-select,
+            #load-btn,
+            #new-handle,
+            #add-handle-btn {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            #problems-table {
+                font-size: 0.9rem;
+            }
+
+            #problems-table th,
+            #problems-table td {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            #problems-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .problem-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar avec hamburger -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html"><img src="logo.png" alt="Logo" class="logo"></a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-right">
+            <a href="index.html" id="nav-home">Accueil</a>
+            <a href="index.html#Apropos" id="nav-about">A&nbsp;propos</a>
+            <a href="problem.html" id="nav-problems">Problems</a>
+            <a href="contest.html" id="nav-contests">Contests</a>
+            <a href="problem.html#contact" id="nav-contact">Contact</a>
+        </div>
+    </nav>
+    
+    <div class="mobile-nav" id="mobileNav">
+        <a href="index.html" id="nav-home-mobile">Accueil</a>
+        <a href="index.html#Apropos" id="nav-about-mobile">A&nbsp;propos</a>
+        <a href="problem.html" id="nav-problems-mobile">Problems</a>
+        <a href="contest.html" id="nav-contests-mobile">Contests</a>
+        <a href="problem.html#contact" id="nav-contact-mobile">Contact</a>
+    </div>
+
+    <div class="problem-container">
+        <!-- Header -->
+        <header>
+            <h1>Statistiques des Problèmes</h1>
+            <div class="controls">
+                <div class="control-row">
+                    <select id="period-select">
+                        <option value="tous">Toutes les périodes</option>
+                        <option value="last12months">Dernièrs 12 mois</option>
+                        <option value="last30days">Derniers 30 jours</option>
+                        <option value="today">Dernières 24 h</option>
+                    </select>
+                    <button id="load-btn"><i class="fas fa-sync"></i> Charger les stats</button>
+                </div>
+
+                <div class="add-handle-container">
+                    <input type="text" id="new-handle" placeholder="Ajouter un handle tunisien">
+                    <button id="add-handle-btn"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+
+                <div id="handle-message"></div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main>
+            <div id="loading-indicator" class="hidden">Chargement en cours...</div>
+
+            <div id="progress-container" class="hidden">
+                <div id="progress-bar"></div>
+                <div id="progress-text">0%</div>
+            </div>
+
+            <table id="problems-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Handle</th>
+                        <th>Organisation</th>
+                        <th>Rating</th>
+                        <th>Problèmes résolus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les données seront chargées dynamiquement -->
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div id="pagination-container" class="pagination-container"></div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <a href="index.html"><img src="logo1.png" alt="" style="max-width: 300px; padding: 0 20px;"></a>
+        <div class="footer-content">
+            <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive</p>
+            <p>© 2025 Tous droits réservés</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Intégration des scripts -->
+    <script src="problem.js"></script>
+    <script src="tunisianHandles.js"></script>
+    <script src="common1.js"></script>
+
+    <script>
+        // Gestion du menu mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            hamburger.addEventListener('click', () => {
+                mobileNav.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+            
+            // Fermer le menu mobile lorsqu'on clique sur un lien
+            document.querySelectorAll('.mobile-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    hamburger.classList.remove('active');
+                });
+            });
+            
+            // Mettre en surbrillance la navigation active
+            setActiveNav();
+            
+            // Variable pour suivre si le premier chargement a été effectué
+            let firstLoadDone = false;
+            
+            // Charger les données au premier clic sur le bouton
+            document.getElementById('load-btn').addEventListener('click', function() {
+                if (typeof loadStats === 'function') {
+                    loadStats();
+                    firstLoadDone = true;
+                }
+            });
+            
+            // Charger automatiquement les données après le premier chargement
+            document.getElementById('period-select').addEventListener('change', function() {
+                if (firstLoadDone && typeof loadStats === 'function') {
+                    // Afficher l'indicateur de chargement
+                    document.getElementById('loading-indicator').classList.remove('hidden');
+                    
+                    // Simuler un délai de chargement (à remplacer par le vrai chargement)
+                    setTimeout(() => {
+                        loadStats();
+                    }, 300);
+                }
+            });
         });
-        container.appendChild(btn);
-    }
-}
 
-async function refreshProblemStats() {
-    document.getElementById('loading-indicator').style.display = 'block';
-    document.getElementById('progress-container').style.display = 'block';
-    document.getElementById('load-btn').disabled = true;
-
-    const periodMap = {
-        "tous": "all",
-        "last12months": "last12months",
-        "last30days": "last30days",
-        "today": "today"
-    };
-    const periodKey = document.getElementById('period-select').value;
-    const period = periodMap[periodKey] || "all";
-
-    const tbody = document.querySelector('#problems-table tbody');
-    tbody.innerHTML = '';
-    currentData = [];
-
-    const totalHandles = tunisianHandles.length;
-    let processed = 0;
-
-    for (const handle of tunisianHandles) {
-        try {
-            const stat = await getUserStats(handle, period);
-            insertAndSort(stat);
-        } catch {}
-        processed++;
-        const progress = Math.min(100, Math.round((processed / totalHandles) * 100));
-        document.getElementById('progress-bar').style.width = `${progress}%`;
-        document.getElementById('progress-text').textContent = `${progress}%`;
-    }
-
-    document.getElementById('loading-indicator').style.display = 'none';
-    document.getElementById('progress-container').style.display = 'none';
-    document.getElementById('load-btn').disabled = false;
-}
-
-// À connecter dans ton HTML : bouton #load-btn
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('load-btn').addEventListener('click', refreshProblemStats);
-});
+        // Fonction pour mettre à jour la navigation active
+        function setActiveNav() {
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien correspondant à la page actuelle
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            if (currentPage === 'problem.html') {
+                document.getElementById('nav-problems').classList.add('active_Nav');
+                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
+            } else if (currentPage === 'contest.html') {
+                document.getElementById('nav-contests').classList.add('active_Nav');
+                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
+            } else {
+                document.getElementById('nav-home').classList.add('active_Nav');
+                document.getElementById('nav-home-mobile').classList.add('active_Nav');
+            }
+        }
+        
+        // Fonction de simulation de chargement (pour démonstration)
+        function simulateLoading() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            loadingIndicator.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingIndicator.classList.add('hidden');
+                    
+                    // Simuler l'affichage des données après chargement
+                    setTimeout(() => {
+                        document.querySelector('main').style.opacity = '1';
+                    }, 300);
+                }
+            }, 100);
+        }
+         
+    </script>
+</body>
+</html>

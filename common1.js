@@ -4,26 +4,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleInput = document.getElementById('new-handle');
         const messageDiv = document.getElementById('handle-message');
         const newHandle = handleInput.value.trim();
-        
+
         if (!newHandle) return;
-        
-        const success = await verifyAndAddHandle(newHandle);
-        if (success) {
-            messageDiv.textContent = `✅ ${newHandle} ajouté avec succès!`;
-            messageDiv.style.color = 'green';
-            handleInput.value = '';
-            
-            // Recharger les données si nécessaire
-            if (typeof refreshStandings === 'function') refreshStandings();
-            if (typeof refreshProblemStats === 'function') refreshProblemStats();
-        } else {
-            messageDiv.textContent = "❌ Handle invalide ou non tunisien";
-            messageDiv.style.color = 'red';
+
+        const result = await verifyAndAddHandle(newHandle);
+        handleInput.value = '';
+
+        switch (result.status) {
+            case "added":
+                messageDiv.textContent = `✅ ${newHandle} ajouté avec succès !`;
+                messageDiv.style.color = 'green';
+                if (typeof refreshStandings === 'function') refreshStandings();
+                if (typeof refreshProblemStats === 'function') refreshProblemStats();
+                break;
+
+            case "exists":
+                messageDiv.textContent = `⚠️ Le handle ${newHandle} existe déjà dans la liste.`;
+                messageDiv.style.color = 'orange';
+                break;
+
+            case "not_tunisian":
+                messageDiv.textContent = `❌ ${newHandle} est valide mais n'est pas un utilisateur tunisien.`;
+                messageDiv.style.color = 'red';
+                break;
+
+            case "invalid":
+            default:
+                messageDiv.textContent = `❌ ${newHandle} est un handle invalide ou introuvable sur Codeforces.`;
+                messageDiv.style.color = 'red';
+                break;
         }
-        
+
         setTimeout(() => {
             messageDiv.textContent = '';
-        }, 3000);
+        }, 4000);
     });
 });
 

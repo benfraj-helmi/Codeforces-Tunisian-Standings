@@ -138,16 +138,12 @@
         /* Mobile menu */
         .mobile-nav {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
             background: #f5f7fa;
             padding: 1rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 999; /* Très important pour passer au-dessus de tout */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        
+
         .mobile-nav a {
             display: block;
             padding: 0.8rem;
@@ -156,14 +152,9 @@
             border-bottom: 1px solid #eee;
             transition: var(--transition);
         }
-        
+
         .mobile-nav a:hover {
             background: rgba(52, 152, 219, 0.1);
-        }
-        
-        /* Classe active qui rend le menu visible */
-        .mobile-nav.active {
-            display: block;
         }
 
         /* Main content */
@@ -330,28 +321,34 @@
             display: none;
         }
 
-        /* Progress bar styles */
         #progress-container {
-            background: #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 20px auto;
-            max-width: 800px;
-        }
+    border-radius: 8px;
+    border: 1px solid #cec9c9;
+    overflow: hidden;
+    margin: 20px auto;
+    max-width: 800px;
+}
 
-        #progress-bar {
-            height: 20px;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+#progress-bar {
+    position: relative; /* Important pour positionner le texte à l’intérieur */
+    height: 20px;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    width: 0%;
+    padding: 15px;
+    transition: width 0.3s ease;
+}
 
-        #progress-text {
-            text-align: center;
-            padding: 5px;
-            font-weight: bold;
-            color: var(--dark);
-        }
+#progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrage parfait */
+    font-weight: bold;
+    color: var(--dark);
+    white-space: nowrap; /* Pour éviter que le texte se casse si trop long */
+    pointer-events: none; /* Pour ne pas bloquer les interactions avec la barre */
+}
+
 
         /* Table styles */
         #problems-table {
@@ -660,8 +657,7 @@
             <div id="loading-indicator" class="hidden">Chargement en cours...</div>
 
             <div id="progress-container" class="hidden">
-                <div id="progress-bar"></div>
-                <div id="progress-text">0%</div>
+                <div id="progress-bar"><div id="progress-text">0%</div></div>
             </div>
 
             <table id="problems-table">
@@ -691,9 +687,9 @@
             <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive</p>
             <p>© 2025 Tous droits réservés</p>
             <div class="social-icons">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-github"></i></a>
-                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://www.facebook.com/share/1AnTdHNXra/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://github.com/benfraj-helmi" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/montassar-benfraj-43a527282" target="_blank"><i class="fab fa-linkedin-in"></i></a>
             </div>
         </div>
     </footer>
@@ -750,28 +746,47 @@
             });
         });
 
-        // Fonction pour mettre à jour la navigation active
+         // Fonction pour mettre à jour la navigation active
         function setActiveNav() {
             // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
+            document.querySelectorAll('.nav-right a').forEach(link => {
                 link.classList.remove('active_Nav');
             });
             
             // Ajouter la classe active au lien correspondant à la page actuelle
             const currentPage = window.location.pathname.split('/').pop();
+            const hash = window.location.hash;
             
-            if (currentPage === 'problem.html') {
+            if ( currentPage === 'problem.html' && hash === '#contact') {
+                document.getElementById('nav-contact').classList.add('active_Nav');
+            } else if (currentPage === 'problem.html') {
                 document.getElementById('nav-problems').classList.add('active_Nav');
-                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
             } else if (currentPage === 'contest.html') {
                 document.getElementById('nav-contests').classList.add('active_Nav');
-                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
             } else {
                 document.getElementById('nav-home').classList.add('active_Nav');
-                document.getElementById('nav-home-mobile').classList.add('active_Nav');
             }
         }
+
         
+
+        document.getElementById('nav-contact').addEventListener('click', function(e) {
+            // Empêcher le comportement par défaut
+            e.preventDefault();
+            
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            
+            // Ajouter la classe active au lien "A propos"
+            this.classList.add('active_Nav');
+            
+            // Faire défiler jusqu'à la section "A propos"
+            document.querySelector('#contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
         // Fonction de simulation de chargement (pour démonstration)
         function simulateLoading() {
             const loadingIndicator = document.getElementById('loading-indicator');

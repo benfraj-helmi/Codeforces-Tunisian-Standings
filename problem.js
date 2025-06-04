@@ -135,32 +135,37 @@
             transition: var(--transition);
         }
 
-        /* Mobile menu */
-       .mobile-nav {
+       /* Mobile menu */
+.mobile-nav {
     display: none;
     position: fixed;
-    top: 60px; /* ajuste selon la hauteur de ta navbar */
+    top: 0;
     left: 0;
     width: 100%;
     background: #f5f7fa;
     padding: 1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    z-index: 999;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 999; /* Très important pour passer au-dessus de tout */
 }
 
+.mobile-nav a {
+    display: block;
+    padding: 0.8rem;
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+    transition: var(--transition);
+}
 
-        .mobile-nav a {
-            display: block;
-            padding: 0.8rem;
-            color: var(--primary);
-            text-decoration: none;
-            border-bottom: 1px solid #eee;
-            transition: var(--transition);
-        }
+.mobile-nav a:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
 
-        .mobile-nav a:hover {
-            background: rgba(52, 152, 219, 0.1);
-        }
+/* Classe active qui rend le menu visible */
+.mobile-nav.active {
+    display: block;
+}
+
 
         /* Main content */
         .problem-container {

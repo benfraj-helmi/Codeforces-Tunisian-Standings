@@ -686,7 +686,8 @@
     </footer>
 
     <script>
-       document.addEventListener('DOMContentLoaded', function () {
+        // Typewriter effect
+        document.addEventListener('DOMContentLoaded', function () {
             const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
             const typewriterElement = document.getElementById('typewriter-text');
             typewriterElement.innerHTML = '';
@@ -713,13 +714,12 @@
             const hamburger = document.getElementById('hamburger');
             const mobileNav = document.getElementById('mobileNav');
 
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
+            hamburger.addEventListener('click', () => {
                 mobileNav.classList.toggle('active');
                 hamburger.classList.toggle('active');
             });
 
-            // Fermer le menu mobile lorsqu'on clique sur un lien
+            // Close mobile menu when clicking a link
             document.querySelectorAll('.mobile-nav a').forEach(link => {
                 link.addEventListener('click', () => {
                     mobileNav.classList.remove('active');
@@ -727,55 +727,73 @@
                 });
             });
 
-            // Fermer le menu si on clique en dehors
-            document.addEventListener('click', (e) => {
-                if (!mobileNav.contains(e.target) && !hamburger.contains(e.target)) {
-                    mobileNav.classList.remove('active');
-                    hamburger.classList.remove('active');
-                }
-            });
-
-            // Initialiser la navigation active
+            // Active navigation
             setActiveNav();
         });
 
         // Fonction pour mettre à jour la navigation active
         function setActiveNav() {
             // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
+            document.querySelectorAll('.nav-right a').forEach(link => {
                 link.classList.remove('active_Nav');
             });
 
-            // Récupérer la page actuelle et le hash
+            // Ajouter la classe active au lien correspondant à la page actuelle
             const currentPage = window.location.pathname.split('/').pop();
             const hash = window.location.hash;
 
-            // Déterminer le lien actif en fonction de la page et du hash
-            if (currentPage === 'index.html' || currentPage === '') {
-                if (hash === '#Apropos') {
-                    document.getElementById('nav-about').classList.add('active_Nav');
-                    document.getElementById('nav-about-mobile').classList.add('active_Nav');
-                } else if (hash === '#contact') {
-                    document.getElementById('nav-contact').classList.add('active_Nav');
-                    document.getElementById('nav-contact-mobile').classList.add('active_Nav');
-                } else {
-                    document.getElementById('nav-home').classList.add('active_Nav');
-                    document.getElementById('nav-home-mobile').classList.add('active_Nav');
-                }
+            if (currentPage === 'index.html' && hash === '#Apropos') {
+                document.getElementById('nav-about').classList.add('active_Nav');
             } else if (currentPage === 'problem.html') {
                 document.getElementById('nav-problems').classList.add('active_Nav');
-                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
             } else if (currentPage === 'contest.html') {
                 document.getElementById('nav-contests').classList.add('active_Nav');
-                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
+            } else {
+                document.getElementById('nav-home').classList.add('active_Nav');
             }
         }
 
-        // Mettre à jour la navigation active lors du changement de hash
-        window.addEventListener('hashchange', setActiveNav);
+        // Gestionnaire pour le lien "A propos"
+        document.getElementById('nav-about').addEventListener('click', function (e) {
+            // Empêcher le comportement par défaut
+            e.preventDefault();
 
-        // Mettre à jour la navigation active lors du chargement de la page
-        window.addEventListener('load', setActiveNav);
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+
+            // Ajouter la classe active au lien "A propos"
+            this.classList.add('active_Nav');
+
+            // Faire défiler jusqu'à la section "A propos"
+            document.querySelector('#Apropos').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        document.getElementById('nav-contact').addEventListener('click', function (e) {
+            // Empêcher le comportement par défaut
+            e.preventDefault();
+
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+
+            // Ajouter la classe active au lien "A propos"
+            this.classList.add('active_Nav');
+
+            // Faire défiler jusqu'à la section "A propos"
+            document.querySelector('#contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+
+
+        // Update active nav on hash change
+        window.addEventListener('hashchange', setActiveNav);
 
         // Animation on scroll
         function animateOnScroll() {
@@ -794,6 +812,10 @@
         window.addEventListener('scroll', animateOnScroll);
         animateOnScroll(); // Initial check
     </script>
+
+
+    
+
 </body>
 
 </html>

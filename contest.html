@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contest Standings</title>
+    <title>Classement des Contests</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -29,31 +29,6 @@
             --transition: all 0.3s ease;
         }
 
-        .pagination-container {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .pagination-btn {
-            margin: 2px;
-            padding: 5px 10px;
-            cursor: pointer;
-            background-color: #f2f2f2;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .pagination-btn:hover {
-            background-color: #ddd;
-        }
-
-        .pagination-btn.active {
-            background-color: #4285f4;
-            color: white;
-            font-weight: bold;
-            border-color: #4285f4;
-        }
-
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--dark);
@@ -65,85 +40,127 @@
 
         /* Navbar styles */
         .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 5%;
-    background-color: #f5f7fa;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 5%;
+            background-color: #f5f7fa;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
 
-.nav-left {
-    display: flex;
-    align-items: center;
-}
+        .nav-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 200px;
+        }
 
-.logo {
-    width: 40%;
-    margin-right: 15px;
-}
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-right: 15px;
+        }
 
-.nav-right {
-    display: flex;
-    gap: 2rem;
-}
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-.nav-right a {
-    color: var(--primary); /* Couleur par défaut (gris foncé) */
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: var(--transition);
-    position: relative;
-}
+        .nav-right a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+            white-space: nowrap;
+        }
 
-/* Style pour le lien actif - doit être APRÈS la déclaration de base */
-.nav-right a.active_Nav {
-    color: var(--secondary); /* Couleur de texte bleu */
-    background: rgba(101, 100, 100, 0.1); /* Fond gris */
-    cursor: default; /* Curseur normal */
-}
+        .nav-right a.active_Nav {
+            color: var(--secondary);
+            background: rgba(101, 100, 100, 0.1);
+        }
 
-.nav-right a.active_Nav::before {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%; /* Barre pleine largeur */
-    height: 3px;
-    background: var(--secondary); /* Couleur bleue */
-    transition: var(--transition);
-}
+        .nav-right a.active_Nav::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
 
-/* Style pour le survol - doit être APRÈS la déclaration du lien actif */
-.nav-right a:hover {
-    color: var(--secondary);
-    background: rgba(101, 100, 100, 0.1);
-}
+        .nav-right a:hover {
+            color: var(--secondary);
+            background: rgba(101, 100, 100, 0.1);
+        }
 
-.nav-right a::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 3px;
-    background: var(--secondary);
-    transition: var(--transition);
-}
+        .nav-right a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
 
-.nav-right a:hover::after {
-    width: 100%;
-} 
+        .nav-right a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background: var(--primary);
+            margin: 2px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        /* Mobile menu */
+        .mobile-nav {
+            display: none;
+            width: 100%;
+            background: #f5f7fa;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .mobile-nav a:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
         /* Main content */
         .contest-container {
             flex: 1;
-            padding: 4rem 5%;
+            padding: 2rem 5%;
         }
 
         /* Header styles */
@@ -174,17 +191,7 @@
             border-radius: 2px;
         }
 
-        select option {
-            padding: 12px 20px;
-            background: white;
-            border-radius: 10px;
-            color: #2c3e50;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-
-        /* Controls styles - MODIFICATIONS PRINCIPALES */
+        /* Controls styles */
         .controls {
             display: flex;
             flex-direction: column;
@@ -215,7 +222,6 @@
             border-radius: 50px;
             font-size: 1rem;
             height: 48px;
-            /* Hauteur uniforme */
             box-sizing: border-box;
             transition: var(--transition);
         }
@@ -355,50 +361,6 @@
             color: var(--primary);
         }
 
-        /* Footer styles */
-        footer {
-            background: var(--primary);
-            color: var(--light);
-            text-align: center;
-            padding: 2rem;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-content p {
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .social-icons a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: var(--transition);
-        }
-
-        .social-icons a:hover {
-            background: var(--secondary);
-            transform: translateY(-5px);
-        }
-
         .user-handle {
             display: flex;
             align-items: center;
@@ -452,42 +414,124 @@
             text-decoration: none;
         }
 
+        /* Pagination styles */
+        .pagination-container {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px 0;
+        }
+
+        .pagination-btn {
+            margin: 0 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: bold;
+            border-color: var(--secondary);
+        }
+
+        /* Footer styles */
+        footer {
+            background: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
         /* Responsive styles */
         @media (max-width: 992px) {
             .navbar {
-                flex-direction: column;
                 padding: 1rem;
             }
 
-            .nav-right {
-                margin-top: 1rem;
-                gap: 1rem;
-            }
-
-            .text-block h1 {
-                font-size: 2.5rem;
-            }
-
-            .text-block p {
-                font-size: 1.1rem;
+            header h1 {
+                font-size: 2.2rem;
             }
         }
 
         @media (max-width: 768px) {
+            .nav-right {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-nav.active {
+                display: block;
+            }
+
+            .logo {
+                max-width: 150px;
+            }
+
             .controls {
                 flex-direction: column;
                 align-items: center;
             }
 
-            #contest-id,
-            #fetch-standings,
-            .filters {
-                width: 100%;
-                max-width: 400px;
+            .control-row {
+                flex-direction: column;
+                gap: 10px;
             }
 
-            .filters {
-                flex-direction: column;
+            #contest-id,
+            #fetch-standings,
+            #organization-filter,
+            #participation-filter,
+            #new-handle,
+            #add-handle-btn {
+                width: 100%;
+                max-width: 400px;
             }
 
             #standings-table {
@@ -498,11 +542,15 @@
             #standings-table td {
                 padding: 10px 15px;
             }
+
+            .contest-container {
+                padding: 1.5rem;
+            }
         }
 
         @media (max-width: 480px) {
             header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
             #standings-table {
@@ -514,20 +562,32 @@
 </head>
 
 <body>
-    <!-- Navbar -->
+    <!-- Navbar avec hamburger -->
     <nav class="navbar">
         <div class="nav-left">
             <a href="index.html"><img src="logo.png" alt="Logo" class="logo"></a>
         </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <div class="nav-right">
             <a href="index.html" id="nav-home">Accueil</a>
-            <a href="#Apropos" id="nav-about">A&nbsp;propos</a>
+            <a href="index.html#Apropos" id="nav-about">A&nbsp;propos</a>
             <a href="problem.html" id="nav-problems">Problems</a>
             <a href="contest.html" id="nav-contests">Contests</a>
-            <a href="#contact" id="nav-contact">Contact</a>
+            <a href="contest.html#contact" id="nav-contact">Contact</a>
         </div>
     </nav>
-
+    
+    <div class="mobile-nav" id="mobileNav">
+        <a href="index.html" id="nav-home-mobile">Accueil</a>
+        <a href="index.html#Apropos" id="nav-about-mobile">A&nbsp;propos</a>
+        <a href="problem.html" id="nav-problems-mobile">Problems</a>
+        <a href="contest.html" id="nav-contests-mobile">Contests</a>
+        <a href="contest.html#contact" id="nav-contact-mobile">Contact</a>
+    </div>
 
     <div class="contest-container">
         <!-- Header -->
@@ -555,7 +615,6 @@
             </div>
         </header>
 
-
         <!-- Main content -->
         <main>
             <div id="loading" class="hidden">Chargement...</div>
@@ -571,22 +630,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Les lignes du classement seront ajoutées ici dynamiquement -->
+                    <!-- Les données seront chargées dynamiquement -->
                 </tbody>
             </table>
 
             <!-- Pagination -->
             <div id="pagination" class="pagination-container"></div>
         </main>
-
     </div>
 
     <!-- Footer -->
     <footer id="contact">
-        <a href="index.html"><img src="logo1.png" alt="" style="width: 350px; padding: 0 20px;"></a>
+        <a href="index.html"><img src="logo1.png" alt="" style="max-width: 300px; padding: 0 20px;"></a>
         <div class="footer-content">
-            <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive
-            </p>
+            <p>Codeforces Tunisian Standings - Suivez votre progression dans le monde de la programmation compétitive</p>
             <p>© 2025 Tous droits réservés</p>
             <div class="social-icons">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -596,58 +653,55 @@
         </div>
     </footer>
 
+    <!-- Intégration des scripts -->
     <script src="contest.js"></script>
     <script src="tunisianHandles.js"></script>
     <script src="common1.js"></script>
- <script>
+
+    <script>
+        // Gestion du menu mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileNav = document.getElementById('mobileNav');
+            
+            hamburger.addEventListener('click', () => {
+                mobileNav.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+            
+            // Fermer le menu mobile lorsqu'on clique sur un lien
+            document.querySelectorAll('.mobile-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                    hamburger.classList.remove('active');
+                });
+            });
+            
+            // Mettre en surbrillance la navigation active
+            setActiveNav();
+        });
+
         // Fonction pour mettre à jour la navigation active
         function setActiveNav() {
             // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
+            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
                 link.classList.remove('active_Nav');
             });
             
             // Ajouter la classe active au lien correspondant à la page actuelle
             const currentPage = window.location.pathname.split('/').pop();
-            const hash = window.location.hash;
             
-            if (currentPage === 'contest.html' && hash === '#contact') {
-                document.getElementById('nav-contact').classList.add('active_Nav');
+            if (currentPage === 'contest.html') {
+                document.getElementById('nav-contests').classList.add('active_Nav');
+                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
             } else if (currentPage === 'problem.html') {
                 document.getElementById('nav-problems').classList.add('active_Nav');
-            } else if (currentPage === 'contest.html') {
-                document.getElementById('nav-contests').classList.add('active_Nav');
+                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
             } else {
                 document.getElementById('nav-home').classList.add('active_Nav');
+                document.getElementById('nav-home-mobile').classList.add('active_Nav');
             }
         }
-
-        // Gestionnaire pour le lien "A propos"
-        document.getElementById('nav-contact').addEventListener('click', function(e) {
-            // Empêcher le comportement par défaut
-            e.preventDefault();
-            
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-            
-            // Ajouter la classe active au lien "A propos"
-            this.classList.add('active_Nav');
-            
-            // Faire défiler jusqu'à la section "A propos"
-            document.querySelector('#contact').scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-
-        // Appeler la fonction au chargement de la page
-        document.addEventListener('DOMContentLoaded', setActiveNav);
-        
-        // Mettre à jour l'état actif lors des changements de hash
-        window.addEventListener('hashchange', setActiveNav);
     </script>
-
 </body>
-
 </html>

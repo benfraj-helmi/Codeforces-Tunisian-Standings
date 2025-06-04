@@ -746,30 +746,29 @@
             });
         });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const hamburger = document.getElementById('hamburger');
-    const mobileNav = document.getElementById('mobileNav');
+        // Fonction pour mettre à jour la navigation active
+        function setActiveNav() {
+            // Supprimer la classe active de tous les liens
+            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
+                link.classList.remove('active_Nav');
+            });
+            document.getElementById('nav-problems').classList.add('active_Nav');
+            // Récupérer la page actuelle et le hash
+            const currentPage = window.location.pathname.split('/').pop();
+            const hash = window.location.hash;
+            // Déterminer le lien actif en fonction de la page et du hash
+            if (currentPage === 'problem.html' || currentPage === '') {
+                if (hash === '#contact') {
+                    document.getElementById('nav-contact').classList.add('active_Nav');
 
-    hamburger.addEventListener('click', () => {
-        mobileNav.classList.toggle('active');
-        hamburger.classList.toggle('active');
-    });
+                }
+            }
+        }
+        // Mettre à jour la navigation active lors du changement de hash
+        window.addEventListener('hashchange', setActiveNav);
 
-    document.querySelectorAll('.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            hamburger.classList.remove('active');
-        });
-    });
-
-    document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
-        link.classList.remove('active_Nav');
-    });
-
-    document.getElementById('nav-problems')?.classList.add('active_Nav');
-    document.getElementById('nav-problems-mobile')?.classList.add('active_Nav');
-});
-
+        // Mettre à jour la navigation active lors du chargement de la page
+        window.addEventListener('load', setActiveNav);
 
 
         // Mettre à jour la navigation active lors du changement de hash

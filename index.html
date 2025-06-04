@@ -739,17 +739,7 @@
         mobileNav.classList.remove('active');
     });
 
-            hamburger.addEventListener('click', () => {
-                mobileNav.classList.toggle('active');
-                hamburger.classList.toggle('active');
-            });
-
-            // Close mobile menu when clicking a link
-            document.querySelectorAll('.mobile-nav a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileNav.classList.remove('active');
-                    hamburger.classList.remove('active');
-                });
+           
             });
 
             // Active navigation

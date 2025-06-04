@@ -712,44 +712,68 @@
 
 <script>
 
+
 document.addEventListener('DOMContentLoaded', function () {
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
-    // Ouvrir/Fermer le menu avec le hamburger
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        mobileNav.classList.toggle('active');
-        hamburger.classList.toggle('active');
-    });
+    // Ouvrir/Fermer le menu
+    if (hamburger && mobileNav) {
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileNav.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
 
-    // Empêcher fermeture du menu si clic à l'intérieur
-    mobileNav.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
+        mobileNav.addEventListener('click', (e) => e.stopPropagation());
 
-    // Fermer le menu si clic ailleurs
-    document.addEventListener('click', () => {
-        mobileNav.classList.remove('active');
-        hamburger.classList.remove('active');
-    });
-
-    // Fermer le menu si clic sur un lien
-    document.querySelectorAll('.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
+        document.addEventListener('click', () => {
             mobileNav.classList.remove('active');
             hamburger.classList.remove('active');
         });
-    });
 
-    // Activer la navigation en surbrillance
+        document.querySelectorAll('.mobile-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+    }
+
+    // Active nav
     setActiveNav();
 
-    // Variable de suivi pour le premier chargement
-    let firstLoadDone = false;
+    // Gestion du lien "A propos"
+    const navAbout = document.getElementById('nav-about');
+    if (navAbout) {
+        navAbout.addEventListener('click', function (e) {
+            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+                e.preventDefault();
+                document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
+                this.classList.add('active_Nav');
+                document.querySelector('#Apropos')?.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
 
-    // Chargement manuel via bouton
+    // Gestion du lien "Contact"
+    const navContact = document.getElementById('nav-contact');
+    if (navContact) {
+        navContact.addEventListener('click', function (e) {
+            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+                e.preventDefault();
+                document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
+                this.classList.add('active_Nav');
+                document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
+
+    // Chargement des stats
+    let firstLoadDone = false;
     const loadBtn = document.getElementById('load-btn');
+    const periodSelect = document.getElementById('period-select');
+
     if (loadBtn) {
         loadBtn.addEventListener('click', function () {
             if (typeof loadStats === 'function') {
@@ -759,69 +783,46 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Chargement automatique après sélection si déjà chargé une fois
-    const periodSelect = document.getElementById('period-select');
     if (periodSelect) {
         periodSelect.addEventListener('change', function () {
             if (firstLoadDone && typeof loadStats === 'function') {
-                const loadingIndicator = document.getElementById('loading-indicator');
-                if (loadingIndicator) {
-                    loadingIndicator.classList.remove('hidden');
-                }
-
-                // Simulation d’un court délai (remplaçable)
+                document.getElementById('loading-indicator')?.classList.remove('hidden');
                 setTimeout(() => {
                     loadStats();
                 }, 300);
             }
         });
     }
+
+    // Sur changement de hash
+    window.addEventListener('hashchange', setActiveNav);
 });
 
+// Fonction pour activer le bon onglet selon l’URL
+function setActiveNav() {
+    document.querySelectorAll('.nav-right a').forEach(link => {
+        link.classList.remove('active_Nav');
+    });
 
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const hash = window.location.hash;
 
-
-         // Fonction pour mettre à jour la navigation active
-        function setActiveNav() {
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-            
-            // Ajouter la classe active au lien correspondant à la page actuelle
-            const currentPage = window.location.pathname.split('/').pop();
-            const hash = window.location.hash;
-            
-            if ( currentPage === 'problem.html' && hash === '#contact') {
-                document.getElementById('nav-contact').classList.add('active_Nav');
-            } else if (currentPage === 'problem.html') {
-                document.getElementById('nav-problems').classList.add('active_Nav');
-            } else if (currentPage === 'contest.html') {
-                document.getElementById('nav-contests').classList.add('active_Nav');
-            } else {
-                document.getElementById('nav-home').classList.add('active_Nav');
-            }
+    if (page === 'index.html' || page === '') {
+        if (hash === '#Apropos') {
+            document.getElementById('nav-about')?.classList.add('active_Nav');
+        } else if (hash === '#contact') {
+            document.getElementById('nav-contact')?.classList.add('active_Nav');
+        } else {
+            document.getElementById('nav-home')?.classList.add('active_Nav');
         }
+    } else if (page === 'problem.html') {
+        document.getElementById('nav-problems')?.classList.add('active_Nav');
+    } else if (page === 'contest.html') {
+        document.getElementById('nav-contests')?.classList.add('active_Nav');
+    }
+}
 
-        
 
-        document.getElementById('nav-contact').addEventListener('click', function(e) {
-            // Empêcher le comportement par défaut
-            e.preventDefault();
-            
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-            
-            // Ajouter la classe active au lien "A propos"
-            this.classList.add('active_Nav');
-            
-            // Faire défiler jusqu'à la section "A propos"
-            document.querySelector('#contact').scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
         // Fonction de simulation de chargement (pour démonstration)
         function simulateLoading() {
             const loadingIndicator = document.getElementById('loading-indicator');

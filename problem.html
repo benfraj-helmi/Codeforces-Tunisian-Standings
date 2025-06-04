@@ -711,8 +711,6 @@
     <script src="common1.js"></script>
 
 <script>
-
-
 document.addEventListener('DOMContentLoaded', function () {
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
@@ -739,35 +737,47 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    
+    const links = [
+        { page: 'index.html', ids: ['nav-home', 'nav-home-mobile'] },
+        { page: '', ids: ['nav-home', 'nav-home-mobile'] }, // Pour index.html sans extension
+        { page: 'problem.html', ids: ['nav-problems', 'nav-problems-mobile'] },
+        { page: 'contest.html', ids: ['nav-contests', 'nav-contests-mobile'] }
+    ];
 
-    // Active nav
-    setActiveNav();
+    const currentPage = window.location.pathname.split('/').pop();
 
-    // Gestion du lien "A propos"
-    const navAbout = document.getElementById('nav-about');
-    if (navAbout) {
-        navAbout.addEventListener('click', function (e) {
-            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-                e.preventDefault();
-                document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
-                this.classList.add('active_Nav');
-                document.querySelector('#Apropos')?.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+    links.forEach(link => {
+        if (link.page === currentPage) {
+            link.ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('active_Nav');
+                }
+            });
+        }
+    });
+
+    // Gestion du hash (ex: #Apropos ou #contact dans index.html ou contest.html)
+    const hash = window.location.hash;
+
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#Apropos') {
+        document.getElementById('nav-about')?.classList.add('active_Nav');
+        document.getElementById('nav-about-mobile')?.classList.add('active_Nav');
     }
 
-    // Gestion du lien "Contact"
-    const navContact = document.getElementById('nav-contact');
-    if (navContact) {
-        navContact.addEventListener('click', function (e) {
-            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
-                e.preventDefault();
-                document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
-                this.classList.add('active_Nav');
-                document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
     }
+
+    if (currentPage === 'contest.html' && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+    }
+
+
+ 
 
     // Chargement des stats
     let firstLoadDone = false;
@@ -794,33 +804,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Sur changement de hash
-    window.addEventListener('hashchange', setActiveNav);
 });
 
-// Fonction pour activer le bon onglet selon l’URL
-function setActiveNav() {
-    document.querySelectorAll('.nav-right a').forEach(link => {
-        link.classList.remove('active_Nav');
-    });
-
-    const page = window.location.pathname.split('/').pop() || 'index.html';
-    const hash = window.location.hash;
-
-    if (page === 'index.html' || page === '') {
-        if (hash === '#Apropos') {
-            document.getElementById('nav-about')?.classList.add('active_Nav');
-        } else if (hash === '#contact') {
-            document.getElementById('nav-contact')?.classList.add('active_Nav');
-        } else {
-            document.getElementById('nav-home')?.classList.add('active_Nav');
-        }
-    } else if (page === 'problem.html') {
-        document.getElementById('nav-problems')?.classList.add('active_Nav');
-    } else if (page === 'contest.html') {
-        document.getElementById('nav-contests')?.classList.add('active_Nav');
-    }
-}
 
 
         // Fonction de simulation de chargement (pour démonstration)

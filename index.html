@@ -731,37 +731,42 @@
             setActiveNav();
         });
 
-        // Fonction pour mettre à jour la navigation active
-        function setActiveNav() {
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
+       function setActiveNav() {
+    // Supprimer la classe active de tous les liens
+    document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
+        link.classList.remove('active_Nav');
+    });
 
-            // Récupérer la page actuelle et le hash
-            const currentPage = window.location.pathname.split('/').pop();
-            const hash = window.location.hash;
+    // Extraire le nom de la page sans paramètres ou hash
+    const fullPath = window.location.pathname;
+    const currentPage = fullPath.substring(fullPath.lastIndexOf('/') + 1).split('#')[0].split('?')[0];
+    const hash = window.location.hash;
 
-            // Déterminer le lien actif en fonction de la page et du hash
-            if (currentPage === 'index.html' || currentPage === '') {
-                if (hash === '#Apropos') {
-                    document.getElementById('nav-about').classList.add('active_Nav');
-                    document.getElementById('nav-about-mobile').classList.add('active_Nav');
-                } else if (hash === '#contact') {
-                    document.getElementById('nav-contact').classList.add('active_Nav');
-                    document.getElementById('nav-contact-mobile').classList.add('active_Nav');
-                } else {
-                    document.getElementById('nav-home').classList.add('active_Nav');
-                    document.getElementById('nav-home-mobile').classList.add('active_Nav');
-                }
-            } else if (currentPage === 'problem.html') {
-                document.getElementById('nav-problems').classList.add('active_Nav');
-                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
-            } else if (currentPage === 'contest.html') {
-                document.getElementById('nav-contests').classList.add('active_Nav');
-                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
-            }
+    // Détection des pages
+    if (currentPage === 'index.html' || currentPage === '') {
+        if (hash === '#Apropos') {
+            document.getElementById('nav-about')?.classList.add('active_Nav');
+            document.getElementById('nav-about-mobile')?.classList.add('active_Nav');
+        } else if (hash === '#contact') {
+            document.getElementById('nav-contact')?.classList.add('active_Nav');
+            document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+        } else {
+            document.getElementById('nav-home')?.classList.add('active_Nav');
+            document.getElementById('nav-home-mobile')?.classList.add('active_Nav');
         }
+    } else if (currentPage === 'problem.html') {
+        document.getElementById('nav-problems')?.classList.add('active_Nav');
+        document.getElementById('nav-problems-mobile')?.classList.add('active_Nav');
+    } else if (currentPage === 'contest.html') {
+        if (hash === '#contact') {
+            document.getElementById('nav-contact')?.classList.add('active_Nav');
+            document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+        } else {
+            document.getElementById('nav-contests')?.classList.add('active_Nav');
+            document.getElementById('nav-contests-mobile')?.classList.add('active_Nav');
+        }
+    }
+}
         // Mettre à jour la navigation active lors du changement de hash
         window.addEventListener('hashchange', setActiveNav);
 

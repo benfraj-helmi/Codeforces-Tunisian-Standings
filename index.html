@@ -724,6 +724,20 @@
             // Mobile menu toggle
             const hamburger = document.getElementById('hamburger');
             const mobileNav = document.getElementById('mobileNav');
+            hamburger.addEventListener('click', (e) => {
+        e.stopPropagation(); // empêche la propagation du clic vers le body
+        mobileNav.classList.toggle('active');
+    });
+
+    // Empêche la fermeture quand on clique dans le menu
+    mobileNav.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Ferme le menu quand on clique ailleurs
+    document.addEventListener('click', () => {
+        mobileNav.classList.remove('active');
+    });
 
             hamburger.addEventListener('click', () => {
                 mobileNav.classList.toggle('active');
@@ -819,7 +833,7 @@
                 }
             });
         }
-
+        
         window.addEventListener('scroll', animateOnScroll);
         animateOnScroll(); // Initial check
     </script>

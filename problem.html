@@ -710,9 +710,7 @@
     <script src="tunisianHandles.js"></script>
     <script src="common1.js"></script>
 
-    <script>
-        // Gestion du menu mobile
- 
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const text = "Classements des Tunisiens sur Codeforces — par problèmes résolus ou concours. Suivez, comparez, progressez !";
     const typewriterElement = document.getElementById('typewriter-text');
@@ -768,33 +766,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Active navigation (assuming you have a function for this)
     setActiveNav();
+});
 
 
-            
-            // Variable pour suivre si le premier chargement a été effectué
-            let firstLoadDone = false;
-            
-            // Charger les données au premier clic sur le bouton
-            document.getElementById('load-btn').addEventListener('click', function() {
-                if (typeof loadStats === 'function') {
-                    loadStats();
-                    firstLoadDone = true;
-                }
-            });
-            
-            // Charger automatiquement les données après le premier chargement
-            document.getElementById('period-select').addEventListener('change', function() {
-                if (firstLoadDone && typeof loadStats === 'function') {
-                    // Afficher l'indicateur de chargement
-                    document.getElementById('loading-indicator').classList.remove('hidden');
-                    
-                    // Simuler un délai de chargement (à remplacer par le vrai chargement)
-                    setTimeout(() => {
-                        loadStats();
-                    }, 300);
-                }
-            });
-        });
 
          // Fonction pour mettre à jour la navigation active
         function setActiveNav() {

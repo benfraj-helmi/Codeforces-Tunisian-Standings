@@ -458,12 +458,17 @@
 
         /* Mobile menu */
         .mobile-nav {
-            display: none;
-            width: 100%;
-            background: #f5f7fa;
-            padding: 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    display: none;
+    position: fixed;
+    top: 60px; /* Ajuste à la hauteur de ta navbar */
+    left: 0;
+    width: 100%;
+    background: #f5f7fa;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 999;
+}
+
 
         .mobile-nav a {
             display: block;
@@ -781,6 +786,18 @@
         
         window.addEventListener('scroll', animateOnScroll);
         animateOnScroll(); // Initial check
+          const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+
+    hamburger.addEventListener('click', () => {
+        mobileNav.classList.toggle('active');
+    });
+
+    window.addEventListener('click', function(e) {
+        if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+            mobileNav.classList.remove('active');
+        }
+    });
     </script>
 </body>
 </html>

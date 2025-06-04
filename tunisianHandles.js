@@ -47,7 +47,7 @@ let tunisianHandles =  [
 
 
 
-// Vérification et ajout de nouveaux handles
+/// Vérification et ajout de nouveaux handles
 async function verifyAndAddHandle(newHandle) {
     try {
         const response = await fetch(`https://codeforces.com/api/user.info?handles=${newHandle}`);
@@ -56,31 +56,30 @@ async function verifyAndAddHandle(newHandle) {
         if (data.status === "OK") {
             const user = data.result[0];
 
-            // Vérifie que le user est tunisien
+            // Recharge la liste actuelle
+            const storedHandles = JSON.parse(localStorage.getItem('tunisianHandles')) || [];
+
+            // Vérifie si le handle existe déjà (insensible à la casse si tu veux)
+            if (storedHandles.includes(newHandle)) {
+                return { status: "exists" };
+            }
+
+            // Vérifie que l'utilisateur est tunisien
             if (user.country === "Tunisia") {
-                // Recharge la liste depuis le localStorage pour être à jour
-                const storedHandles = JSON.parse(localStorage.getItem('tunisianHandles')) || [];
+                storedHandles.push(newHandle);
+                localStorage.setItem('tunisianHandles', JSON.stringify(storedHandles));
+                tunisianHandles = storedHandles;
 
-                // Vérifie si le handle existe déjà (insensible à la casse si tu veux)
-                if (!storedHandles.includes(newHandle)) {
-                    storedHandles.push(newHandle);
-
-                    // Mets à jour le localStorage et la variable globale
-                    localStorage.setItem('tunisianHandles', JSON.stringify(storedHandles));
-                    tunisianHandles = storedHandles;
-
-                    console.log("Ajouté :", newHandle);
-                    return true;
-                } else {
-                    console.log("Handle déjà existant :", newHandle);
-                }
+                return { status: "added" };
+            } else {
+                return { status: "not_tunisian" };
             }
         }
 
-        return false;
+        return { status: "invalid" };
     } catch (error) {
         console.error("Erreur de vérification:", error);
-        return false;
+        return { status: "invalid" };
     }
 }
 

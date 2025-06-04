@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classement des Contests</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const links = document.querySelectorAll('.nav-right a, .mobile-nav a');
+
+    links.forEach(link => {
+        link.addEventListener('click', function () {
+            sessionStorage.setItem('activeLink', this.id);
+        });
+    });
+
+    const activeId = sessionStorage.getItem('activeLink');
+    if (activeId) {
+        document.getElementById(activeId)?.classList.add('active_Nav');
+    }
+});
+</script>
+
     <style>
         * {
             margin: 0;

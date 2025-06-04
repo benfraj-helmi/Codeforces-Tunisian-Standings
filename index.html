@@ -719,32 +719,27 @@ document.addEventListener('DOMContentLoaded', function () {
             cursor.remove();
         }
     }
-
     setTimeout(typeWriter, 500);
 
     // Mobile menu toggle
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
-    // Toggle menu on hamburger click
     hamburger.addEventListener('click', (e) => {
         e.stopPropagation();
         mobileNav.classList.toggle('active');
         hamburger.classList.toggle('active');
     });
 
-    // Prevent menu from closing when clicking inside
     mobileNav.addEventListener('click', (e) => {
         e.stopPropagation();
     });
 
-    // Close menu when clicking outside
     document.addEventListener('click', () => {
         mobileNav.classList.remove('active');
         hamburger.classList.remove('active');
     });
 
-    // Close menu when clicking a mobile link
     document.querySelectorAll('.mobile-nav a').forEach(link => {
         link.addEventListener('click', () => {
             mobileNav.classList.remove('active');
@@ -752,74 +747,55 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Active navigation (assuming you have a function for this)
+    // Gestionnaire pour "À propos"
+    const navAbout = document.getElementById('nav-about');
+    if (navAbout) {
+        navAbout.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
+            this.classList.add('active_Nav');
+            document.querySelector('#Apropos').scrollIntoView({ behavior: 'smooth' });
+            history.replaceState(null, null, '#Apropos');
+        });
+    }
+
+    // Gestionnaire pour "Contact"
+    const navContact = document.getElementById('nav-contact');
+    if (navContact) {
+        navContact.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
+            this.classList.add('active_Nav');
+            document.querySelector('#contact').scrollIntoView({ behavior: 'smooth' });
+            history.replaceState(null, null, '#contact');
+        });
+    }
+
+    // Mise à jour navigation active
+    function setActiveNav() {
+        document.querySelectorAll('.nav-right a').forEach(link => link.classList.remove('active_Nav'));
+        const page = window.location.pathname.split('/').pop() || 'index.html';
+        const hash = window.location.hash;
+
+        if (page === 'index.html' || page === '') {
+            if (hash === '#Apropos') {
+                document.getElementById('nav-about')?.classList.add('active_Nav');
+            } else if (hash === '#contact') {
+                document.getElementById('nav-contact')?.classList.add('active_Nav');
+            } else {
+                document.getElementById('nav-home')?.classList.add('active_Nav');
+            }
+        } else if (page === 'problem.html') {
+            document.getElementById('nav-problems')?.classList.add('active_Nav');
+        } else if (page === 'contest.html') {
+            document.getElementById('nav-contests')?.classList.add('active_Nav');
+        }
+    }
+
     setActiveNav();
+    window.addEventListener('hashchange', setActiveNav);
 });
 
-
-        // Fonction pour mettre à jour la navigation active
-        function setActiveNav() {
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-
-            // Ajouter la classe active au lien correspondant à la page actuelle
-            const currentPage = window.location.pathname.split('/').pop();
-            const hash = window.location.hash;
-
-            if (currentPage === 'index.html' && hash === '#Apropos') {
-                document.getElementById('nav-about').classList.add('active_Nav');
-            } else if (currentPage === 'problem.html') {
-                document.getElementById('nav-problems').classList.add('active_Nav');
-            } else if (currentPage === 'contest.html') {
-                document.getElementById('nav-contests').classList.add('active_Nav');
-            } else {
-                document.getElementById('nav-home').classList.add('active_Nav');
-            }
-        }
-
-        // Gestionnaire pour le lien "A propos"
-        document.getElementById('nav-about').addEventListener('click', function (e) {
-            // Empêcher le comportement par défaut
-            e.preventDefault();
-
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-
-            // Ajouter la classe active au lien "A propos"
-            this.classList.add('active_Nav');
-
-            // Faire défiler jusqu'à la section "A propos"
-            document.querySelector('#Apropos').scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-
-        document.getElementById('nav-contact').addEventListener('click', function (e) {
-            // Empêcher le comportement par défaut
-            e.preventDefault();
-
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-
-            // Ajouter la classe active au lien "A propos"
-            this.classList.add('active_Nav');
-
-            // Faire défiler jusqu'à la section "A propos"
-            document.querySelector('#contact').scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-
-
-
-        // Update active nav on hash change
-        window.addEventListener('hashchange', setActiveNav);
 
         // Animation on scroll
         function animateOnScroll() {

@@ -677,8 +677,7 @@
     <script src="common1.js"></script>
 
     <script>
-        // Gestion du menu mobile
-        document.addEventListener('DOMContentLoaded', function () {
+       document.addEventListener('DOMContentLoaded', function () {
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
@@ -710,50 +709,48 @@
 
     // Mise en surbrillance de l'onglet actif
     setActiveNav();
-});
-        
 
-        // Fonction pour mettre à jour la navigation active
-        function setActiveNav() {
-            // Supprimer la classe active de tous les liens
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-
-            // Ajouter la classe active au lien correspondant à la page actuelle
-            const currentPage = window.location.pathname.split('/').pop();
-            const hash = window.location.hash;
-
-            if (currentPage === 'problem.html' && hash === '#contact') {
-                document.getElementById('nav-contact').classList.add('active_Nav');
-            } else if (currentPage === 'problem.html') {
-                document.getElementById('nav-problems').classList.add('active_Nav');
-            } else if (currentPage === 'contest.html') {
-                document.getElementById('nav-contests').classList.add('active_Nav');
-            } else {
-                document.getElementById('nav-home').classList.add('active_Nav');
-            }
-        }
-
-
-
-        document.getElementById('nav-contact').addEventListener('click', function (e) {
-            // Empêcher le comportement par défaut
+    // Ajouter l'écouteur pour nav-contact uniquement si l'élément existe
+    const navContact = document.getElementById('nav-contact');
+    if (navContact) {
+        navContact.addEventListener('click', function (e) {
             e.preventDefault();
 
-            // Supprimer la classe active de tous les liens
             document.querySelectorAll('.nav-right a').forEach(link => {
                 link.classList.remove('active_Nav');
             });
 
-            // Ajouter la classe active au lien "A propos"
             this.classList.add('active_Nav');
 
-            // Faire défiler jusqu'à la section "A propos"
-            document.querySelector('#contact').scrollIntoView({
-                behavior: 'smooth'
-            });
+            const contactSection = document.querySelector('#contact');
+            if (contactSection) {
+                contactSection.scrollIntoView({ behavior: 'smooth' });
+            }
         });
+    }
+});
+
+// Fonction pour mettre à jour la navigation active
+function setActiveNav() {
+    // Supprimer la classe active de tous les liens
+    document.querySelectorAll('.nav-right a').forEach(link => {
+        link.classList.remove('active_Nav');
+    });
+
+    const currentPage = window.location.pathname.split('/').pop();
+    const hash = window.location.hash;
+
+    if (currentPage === 'problem.html' && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+    } else if (currentPage === 'problem.html') {
+        document.getElementById('nav-problems')?.classList.add('active_Nav');
+    } else if (currentPage === 'contest.html') {
+        document.getElementById('nav-contests')?.classList.add('active_Nav');
+    } else {
+        document.getElementById('nav-home')?.classList.add('active_Nav');
+    }
+}
+
     </script>
 </body>
 

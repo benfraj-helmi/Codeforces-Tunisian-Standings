@@ -729,10 +729,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // --- MENU BURGER (mobile) ---
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
+    // Ouvrir/Fermer le menu
     if (hamburger && mobileNav) {
         hamburger.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -754,42 +754,49 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    
+    const links = [
+        { page: 'index.html', ids: ['nav-home', 'nav-home-mobile'] },
+        { page: '', ids: ['nav-home', 'nav-home-mobile'] }, // Pour index.html sans extension
+        { page: 'problem.html', ids: ['nav-problems', 'nav-problems-mobile'] },
+        { page: 'contest.html', ids: ['nav-contests', 'nav-contests-mobile'] }
+    ];
 
-    // --- NAVIGATION ACTIVE ---
     const currentPage = window.location.pathname.split('/').pop();
-    const hash = window.location.hash;
 
-    // Nettoyage : on enlève toutes les classes active_Nav
-    document.querySelectorAll('.nav-right a, .mobile-nav a').forEach(link => {
-        link.classList.remove('active_Nav');
+    links.forEach(link => {
+        if (link.page === currentPage) {
+            link.ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('active_Nav');
+                }
+            });
+        }
     });
 
-    // Fonction d'ajout
-    const activate = (ids) => {
-        ids.forEach(id => document.getElementById(id)?.classList.add('active_Nav'));
-    };
+    // Gestion du hash (ex: #Apropos ou #contact dans index.html ou contest.html)
+    const hash = window.location.hash;
 
-    if (currentPage === 'index.html' || currentPage === '') {
-        if (hash === '#Apropos') activate(['nav-about', 'nav-about-mobile']);
-        else if (hash === '#contact') activate(['nav-contact', 'nav-contact-mobile']);
-        else activate(['nav-home', 'nav-home-mobile']);
-    } 
-    else if (currentPage === 'problem.html') {
-        if (hash === '#contact') {
-            activate(['nav-contact', 'nav-contact-mobile']);
-        } else {
-            activate(['nav-problems', 'nav-problems-mobile']);
-        }
-    } 
-    else if (currentPage === 'contest.html') {
-        if (hash === '#contact') {
-            activate(['nav-contact', 'nav-contact-mobile']);
-        } else {
-            activate(['nav-contests', 'nav-contests-mobile']);
-        }
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#Apropos') {
+        document.getElementById('nav-about')?.classList.add('active_Nav');
+        document.getElementById('nav-about-mobile')?.classList.add('active_Nav');
     }
 
-    // --- CHARGEMENT DES STATS ---
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+    }
+
+    if (currentPage === 'contest.html' && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+    }
+
+
+ 
+
+    // Chargement des stats
     let firstLoadDone = false;
     const loadBtn = document.getElementById('load-btn');
     const periodSelect = document.getElementById('period-select');
@@ -813,34 +820,38 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
 });
 
-// --- SIMULATION DE CHARGEMENT ---
-function simulateLoading() {
-    const loadingIndicator = document.getElementById('loading-indicator');
-    const progressContainer = document.getElementById('progress-container');
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
 
-    loadingIndicator?.classList.remove('hidden');
-    progressContainer?.classList.remove('hidden');
 
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 5;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress}%`;
-
-        if (progress >= 100) {
-            clearInterval(interval);
-            loadingIndicator?.classList.add('hidden');
-            setTimeout(() => {
-                document.querySelector('main')?.style?.setProperty('opacity', '1');
-            }, 300);
-        }
-    }, 100);
-}
-
+        // Fonction de simulation de chargement (pour démonstration)
+        function simulateLoading() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            loadingIndicator.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingIndicator.classList.add('hidden');
+                    
+                    // Simuler l'affichage des données après chargement
+                    setTimeout(() => {
+                        document.querySelector('main').style.opacity = '1';
+                    }, 300);
+                }
+            }, 100);
+        } 
 </script>
 
 </body>

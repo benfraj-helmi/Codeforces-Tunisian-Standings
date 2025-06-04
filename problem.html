@@ -754,45 +754,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
-    
-    const links = [
-        { page: 'index.html', ids: ['nav-home', 'nav-home-mobile'] },
-        { page: '', ids: ['nav-home', 'nav-home-mobile'] }, // Pour index.html sans extension
-        { page: 'problem.html', ids: ['nav-problems', 'nav-problems-mobile'] },
-        { page: 'contest.html', ids: ['nav-contests', 'nav-contests-mobile'] }
-    ];
-
-    const currentPage = window.location.pathname.split('/').pop();
-
-    links.forEach(link => {
-        if (link.page === currentPage) {
-            link.ids.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.classList.add('active_Nav');
-                }
-            });
-        }
+    document.querySelectorAll('nav-contact').addEventListener('click', (e) => {
+      document.getElementById('nav-contact').classList.add('active_Nav');
+      document.getElementById('nav-problems').classList.remove('active_Nav');
     });
-
-    // Gestion du hash (ex: #Apropos ou #contact dans index.html ou contest.html)
-    const hash = window.location.hash;
-
-    if ((currentPage === 'index.html' || currentPage === '') && hash === '#Apropos') {
-        document.getElementById('nav-about')?.classList.add('active_Nav');
-        document.getElementById('nav-about-mobile')?.classList.add('active_Nav');
-    }
-
-    if ((currentPage === 'index.html' || currentPage === '') && hash === '#contact') {
-        document.getElementById('nav-contact')?.classList.add('active_Nav');
-        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
-    }
-
-    if (currentPage === 'contest.html' && hash === '#contact') {
-        document.getElementById('nav-contact')?.classList.add('active_Nav');
-        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
-    }
-
 
  
 

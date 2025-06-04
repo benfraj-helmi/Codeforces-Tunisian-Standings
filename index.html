@@ -754,9 +754,14 @@
                     document.getElementById('nav-home').classList.add('active_Nav');
                     document.getElementById('nav-home-mobile').classList.add('active_Nav');
                 }
-            
+            } else if (currentPage === 'problem.html') {
+                document.getElementById('nav-problems').classList.add('active_Nav');
+                document.getElementById('nav-problems-mobile').classList.add('active_Nav');
+            } else if (currentPage === 'contest.html') {
+                document.getElementById('nav-contests').classList.add('active_Nav');
+                document.getElementById('nav-contests-mobile').classList.add('active_Nav');
+            }
         }
-
         // Mettre à jour la navigation active lors du changement de hash
         window.addEventListener('hashchange', setActiveNav);
 

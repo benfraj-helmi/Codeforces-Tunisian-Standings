@@ -694,81 +694,47 @@ document.addEventListener('DOMContentLoaded', function () {
     <script src="common1.js"></script>
 
     <script>
-       document.addEventListener('DOMContentLoaded', function () {
-    const hamburger = document.getElementById('hamburger');
-    const mobileNav = document.getElementById('mobileNav');
-
-    // Ouvrir/Fermer le menu mobile
-    hamburger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        mobileNav.classList.toggle('active');
-        hamburger.classList.toggle('active');
-    });
-
-    // Empêcher la fermeture si clic à l'intérieur du menu
-    mobileNav.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-
-    // Fermer le menu si clic ailleurs sur la page
-    document.addEventListener('click', () => {
-        mobileNav.classList.remove('active');
-        hamburger.classList.remove('active');
-    });
-
-    // Fermer le menu si clic sur un lien
-    document.querySelectorAll('.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            hamburger.classList.remove('active');
-        });
-    });
-
-    // Mise en surbrillance de l'onglet actif
-    setActiveNav();
-
-    // Ajouter l'écouteur pour nav-contact uniquement si l'élément existe
-    const navContact = document.getElementById('nav-contact');
-    if (navContact) {
-        navContact.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            document.querySelectorAll('.nav-right a').forEach(link => {
-                link.classList.remove('active_Nav');
-            });
-
-            this.classList.add('active_Nav');
-
-            const contactSection = document.querySelector('#contact');
-            if (contactSection) {
-                contactSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    }
-});
-
-// Fonction pour mettre à jour la navigation active
-function setActiveNav() {
-    // Supprimer la classe active de tous les liens
-    document.querySelectorAll('.nav-right a').forEach(link => {
-        link.classList.remove('active_Nav');
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const links = [
+        { page: 'index.html', ids: ['nav-home', 'nav-home-mobile'] },
+        { page: '', ids: ['nav-home', 'nav-home-mobile'] }, // Pour index.html sans extension
+        { page: 'problem.html', ids: ['nav-problems', 'nav-problems-mobile'] },
+        { page: 'contest.html', ids: ['nav-contests', 'nav-contests-mobile'] }
+    ];
 
     const currentPage = window.location.pathname.split('/').pop();
+
+    links.forEach(link => {
+        if (link.page === currentPage) {
+            link.ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('active_Nav');
+                }
+            });
+        }
+    });
+
+    // Gestion du hash (ex: #Apropos ou #contact dans index.html ou contest.html)
     const hash = window.location.hash;
 
-    if (currentPage === 'problem.html' && hash === '#contact') {
-        document.getElementById('nav-contact')?.classList.add('active_Nav');
-    } else if (currentPage === 'problem.html') {
-        document.getElementById('nav-problems')?.classList.add('active_Nav');
-    } else if (currentPage === 'contest.html') {
-        document.getElementById('nav-contests')?.classList.add('active_Nav');
-    } else {
-        document.getElementById('nav-home')?.classList.add('active_Nav');
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#Apropos') {
+        document.getElementById('nav-about')?.classList.add('active_Nav');
+        document.getElementById('nav-about-mobile')?.classList.add('active_Nav');
     }
-}
 
-    </script>
+    if ((currentPage === 'index.html' || currentPage === '') && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+    }
+
+    if (currentPage === 'contest.html' && hash === '#contact') {
+        document.getElementById('nav-contact')?.classList.add('active_Nav');
+        document.getElementById('nav-contact-mobile')?.classList.add('active_Nav');
+    }
+});
+</script>
+
 </body>
 
 </html>
